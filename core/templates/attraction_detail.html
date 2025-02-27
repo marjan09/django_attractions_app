@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block title %}Attraction Details{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <article class="relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-white shadow-lg">
+        <div class="relative h-[500px] w-full">
+            <img src="{{ attraction.image.url }}" alt="{{ attraction.name }}" class="absolute inset-0 h-full w-full object-cover rounded-2xl">
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 opacity-75 rounded-2xl"></div>
+            <div class="absolute inset-0 flex flex-col justify-end p-6">
+                <h1 class="text-4xl font-bold text-white">{{ attraction.name }}</h1>
+                <div class="flex items-center mt-4">
+                    {% if user_liked %}
+                        <!-- Filled Like Icon (User has liked the attraction) -->
+                        <svg id="likeIcon" xmlns="http://www.w3.org/2000/svg"
+                            class="h-8 w-8 text-white cursor-pointer hover:text-blue-500 transition-colors duration-300"
+                            fill="currentColor" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+                        </svg>
+                    {% else %}
+                        <!-- Empty Like Icon (User has NOT liked the attraction) -->
+                        <svg id="likeIcon" xmlns="http://www.w3.org/2000/svg"
+                            class="h-8 w-8 text-white cursor-pointer hover:text-blue-500 transition-colors duration-300"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+                        </svg>
+                    {% endif %}
+                    <span id="likesCount" class="text-gray-300 ml-4">{{ attraction.likes.count }} Likes</span>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <!-- Description Section -->
+    <section class="mt-8">
+        <p class="text-gray-700 text-lg">{{ attraction.description }}</p>
+    </section>
+
+    <section class="py-24 relative">
+        <div class="w-full max-w-7xl px-4 md:px-5 lg:px-5 mx-auto">
+            <div class="w-full flex-col justify-start items-start lg:gap-10 gap-6 inline-flex">
+                <h2 id="commentsCount" class="text-gray-900 text-3xl font-bold font-manrope leading-normal">{{ comments.count }} Comments</h2>
+                <div class="w-full flex-col justify-start items-start lg:gap-9 gap-6 flex">
+                    {% if user.is_authenticated %}
+                        <form id="commentForm" class="w-full relative flex justify-between gap-2">
+                            {% csrf_token %}
+                            <input type="text" name="content" class="w-full py-3 px-5 rounded-lg border border-gray-300 bg-white shadow-[0px_1px_2px_0px_rgba(16,_24,_40,_0.05)] focus:outline-none text-gray-900 placeholder-gray-400 text-lg font-normal leading-relaxed" placeholder="Write comments here...." required>
+                            <button type="submit" class="absolute right-6 top-[18px]">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M11.3011 8.69906L8.17808 11.8221M8.62402 12.5909L8.79264 12.8821C10.3882 15.638 11.1859 17.016 12.2575 16.9068C13.3291 16.7977 13.8326 15.2871 14.8397 12.2661L16.2842 7.93238C17.2041 5.17273 17.6641 3.79291 16.9357 3.06455C16.2073 2.33619 14.8275 2.79613 12.0679 3.71601L7.73416 5.16058C4.71311 6.16759 3.20259 6.6711 3.09342 7.7427C2.98425 8.81431 4.36221 9.61207 7.11813 11.2076L7.40938 11.3762C7.79182 11.5976 7.98303 11.7083 8.13747 11.8628C8.29191 12.0172 8.40261 12.2084 8.62402 12.5909Z" stroke="#111827" stroke-width="1.6" stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                        </form>
+                    {% else %}
+                        <p class="text-red-500 mt-4">You must <a href="{% url 'login' %}" class="text-blue-600">log in</a> to like or comment.</p>
+                    {% endif %}
+
+                    <div class="w-full flex-col justify-start items-start gap-8 flex" id="commentsContainer">
+                        {% for comment in comments %}
+                            <div class="w-full flex-col justify-start items-end gap-5 flex" id="comment-{{ comment.id }}">
+                                <div class="w-full p-6 bg-white rounded-2xl border border-gray-200 flex-col justify-start items-start gap-8 flex">
+                                    <div class="w-full flex-col justify-center items-start gap-3.5 flex">
+                                        <div class="w-full justify-between items-center inline-flex">
+                                            <div class="justify-start items-center gap-2.5 flex">
+                                                <div class="w-10 h-10 bg-gray-300 rounded-full justify-start items-start gap-2.5 flex">
+                                                    <img class="rounded-full object-cover" src="{{ comment.user.profile.image.url }}" alt="{{ comment.user.username }}" />
+                                                </div>
+                                                <div class="flex-col justify-start items-start gap-1 inline-flex">
+                                                    <h5 class="text-gray-900 text-sm font-semibold leading-snug">{{ comment.user.username }}</h5>
+                                                    <h6 class="text-gray-500 text-xs font-normal leading-5">{{ comment.created_at|timesince }} ago</h6>
+                                                </div>
+                                            </div>
+                                            {% if comment.user == user %}
+                                            <div class="flex gap-2">
+                                                <button class="text-blue-600 hover:underline" onclick="editComment({{ comment.id }})">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-1.5a2.5 2.5 0 113.536 3.536L7.5 21H3v-4.5L16.732 6.732z" />
+                                                    </svg>
+                                                </button>
+                                                <button class="text-red-600 hover:underline" onclick="deleteComment({{ comment.id }})">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                                <button class="text-green-600 hover:underline hidden" id="save-button-{{ comment.id }}" onclick="saveComment({{ comment.id }})">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <p id="comment-content-{{ comment.id }}" class="text-gray-800 text-sm font-normal leading-snug">{{ comment.content }}</p>
+                                        <input id="comment-input-{{ comment.id }}" type="text" class="hidden w-full py-3 px-5 rounded-lg border border-gray-300 bg-white shadow-[0px_1px_2px_0px_rgba(16,_24,_40,_0.05)] focus:outline-none text-gray-900 placeholder-gray-400 text-lg font-normal leading-relaxed" value="{{ comment.content }}">
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Modal -->
+<div id="commentModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden" onclick="closeModal(event)">
+    <div class="bg-white p-6 rounded-lg shadow-lg" onclick="event.stopPropagation()">
+        <h2 class="text-2xl font-bold mb-4">Comment Limit Reached</h2>
+        <p class="text-gray-700">You have already commented on this attraction. You cannot add more than one comment.</p>
+        <button onclick="closeModal()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50">Close</button>
+    </div>
+</div>
+
+<script>
+    let scrollPosition = 0;
+
+    function closeModal(event) {
+        if (event.target.id === 'commentModal' || event.target.tagName === 'BUTTON') {
+            document.getElementById('commentModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+            window.scrollTo(0, scrollPosition);
+        }
+    }
+
+    document.getElementById('commentForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+        scrollPosition = window.scrollY;
+
+        fetch("{% url 'comment_attraction' attraction.id %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.already_commented) {
+                document.getElementById('commentModal').classList.remove('hidden');
+                document.body.classList.add('modal-open');
+            } else if (data.success) {
+                location.reload(); // Reload the page to show the new comment
+            } else if (data.error) {
+                alert(data.error);
+            }
+        });
+    });
+
+    document.getElementById('likeIcon').addEventListener('click', function(event) {
+        event.preventDefault();
+        scrollPosition = window.scrollY;
+
+        fetch("{% url 'like_attraction' attraction.id %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.liked) {
+                document.getElementById('likeIcon').setAttribute('fill', 'currentColor');
+            } else {
+                document.getElementById('likeIcon').setAttribute('fill', 'none');
+            }
+            document.getElementById('likesCount').innerText = data.likes_count + ' Likes';
+            window.scrollTo(0, scrollPosition);
+        });
+    });
+
+    function editComment(commentId) {
+        document.getElementById('comment-content-' + commentId).classList.add('hidden');
+        document.getElementById('comment-input-' + commentId).classList.remove('hidden');
+        document.getElementById('save-button-' + commentId).classList.remove('hidden');
+    }
+
+    function saveComment(commentId) {
+        const content = document.getElementById('comment-input-' + commentId).value;
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        fetch(`/edit_comment/${commentId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ content: content })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('comment-content-' + commentId).innerText = content;
+                document.getElementById('comment-content-' + commentId).classList.remove('hidden');
+                document.getElementById('comment-input-' + commentId).classList.add('hidden');
+                document.getElementById('save-button-' + commentId).classList.add('hidden');
+            } else {
+                alert(data.error);
+            }
+        });
+    }
+
+    function deleteComment(commentId) {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        fetch(`/delete_comment/${commentId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ comment_id: commentId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('comment-' + commentId).remove();
+                updateCommentsCount();
+            } else {
+                alert(data.error);
+            }
+        });
+    }
+
+    function updateCommentsCount() {
+        const commentsCountElement = document.getElementById('commentsCount');
+        const currentCount = parseInt(commentsCountElement.innerText.split(' ')[0]);
+        commentsCountElement.innerText = `${currentCount - 1} Comments`;
+    }
+</script>
+
+<style>
+    .modal-open {
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
