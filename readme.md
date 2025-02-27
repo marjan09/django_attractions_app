@@ -50,6 +50,8 @@ This is a Django-based web application for showcasing tourist attractions. Users
     python manage.py tailwind init
     ```
 
+    make sure to remove theme from settings before doing thi
+
     Follow the prompts to set up Tailwind CSS. Make sure to select the correct app name.
 
 7. Run the Tailwind CSS build process:
