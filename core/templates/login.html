@@ -34,15 +34,27 @@
         </div>
       </div>
 
-      <!-- Display messages just above the submit button -->
+      <!-- Display Messages (with Auto-Close) -->
       {% if messages %}
-        <div class="mt-2">
-          {% for message in messages %}
-            <div class="text-sm text-red-500">{{ message }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
-
+    <div class="space-y-4">
+        {% for message in messages %}
+            <div class="alert-container">
+                {% if message.tags == 'success' %}
+                    <div class="alert rounded-md p-4 bg-green-100 border-l-4 border-green-500 text-green-700">
+                {% else %}
+                    <div class="alert rounded-md p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
+                {% endif %}
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm">{{ message }}</span>
+                        <button class="ml-4 text-lg font-semibold text-gray-700 hover:text-gray-500" onclick="removeAlert(this)">
+                            &times;
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
       <div>
         <button type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Sign in</button>
       </div>
@@ -54,4 +66,15 @@
     </p>
   </div>
 </div>
+<script>
+  // Automatically remove the alert after a short duration (e.g., 5 seconds)
+  function removeAlert(button) {
+        // Remove the parent alert container of the button
+        var alert = button.closest('.alert-container');
+        alert.style.display = 'none';
+    }
+</script>
+
+
 {% endblock %}
+

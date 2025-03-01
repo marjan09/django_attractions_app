@@ -19,6 +19,26 @@
         <div class="mt-2">
           <input type="text" name="username" id="username" autocomplete="username" required class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-offset-2 focus:outline-indigo-600 sm:text-sm">
         </div>
+        {% if form.username.errors %}
+          <div class="mt-2">
+            <div class="alert-container">
+              <div class="alert rounded-md p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm">
+                    <ul class="list-none">
+                      {% for error in form.username.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  </span>
+                  <button class="ml-4 text-lg font-semibold text-gray-700 hover:text-gray-500" onclick="removeAlert(this)">
+                    &times;
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
       </div>
 
       <!-- Email -->
@@ -27,6 +47,26 @@
         <div class="mt-2">
           <input type="email" name="email" id="email" autocomplete="email" required class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-offset-2 focus:outline-indigo-600 sm:text-sm">
         </div>
+        {% if form.email.errors %}
+          <div class="mt-2">
+            <div class="alert-container">
+              <div class="alert rounded-md p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm">
+                    <ul class="list-none">
+                      {% for error in form.email.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  </span>
+                  <button class="ml-4 text-lg font-semibold text-gray-700 hover:text-gray-500" onclick="removeAlert(this)">
+                    &times;
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
       </div>
 
       <!-- Password -->
@@ -36,11 +76,24 @@
           <input type="password" name="password1" id="password1" autocomplete="new-password" required class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-offset-2 focus:outline-indigo-600 sm:text-sm">
         </div>
         {% if form.password1.errors %}
-          <ul class="mt-2 text-red-500 text-sm">
-            {% for error in form.password1.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
+          <div class="mt-2">
+            <div class="alert-container">
+              <div class="alert rounded-md p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm">
+                    <ul class="list-none">
+                      {% for error in form.password1.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  </span>
+                  <button class="ml-4 text-lg font-semibold text-gray-700 hover:text-gray-500" onclick="removeAlert(this)">
+                    &times;
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         {% endif %}
       </div>
 
@@ -51,11 +104,24 @@
           <input type="password" name="password2" id="password2" autocomplete="new-password" required class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-offset-2 focus:outline-indigo-600 sm:text-sm">
         </div>
         {% if form.password2.errors %}
-          <ul class="mt-2 text-red-500 text-sm">
-            {% for error in form.password2.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
+          <div class="mt-2">
+            <div class="alert-container">
+              <div class="alert rounded-md p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm">
+                    <ul class="list-none">
+                      {% for error in form.password2.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  </span>
+                  <button class="ml-4 text-lg font-semibold text-gray-700 hover:text-gray-500" onclick="removeAlert(this)">
+                    &times;
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         {% endif %}
       </div>
 
@@ -70,4 +136,20 @@
     </p>
   </div>
 </div>
+<script>
+  function removeAlert(button) {
+    console.log('Button clicked!');
+    const alertContainer = button.closest('.alert-container');
+    console.log(alertContainer); // Check if alertContainer is found
+    if (alertContainer) {
+      alertContainer.remove();
+    } else {
+      console.log('No alert container found.');
+    }
+  }
+
+
+</script>
+
 {% endblock %}
+

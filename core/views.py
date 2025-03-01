@@ -98,23 +98,31 @@ def login_view(request):
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             user = authenticate(request, username=username, password=password)
-            if user is not None:
+
+            if user:
                 login(request, user)
-                messages.success(request, f'Welcome back, {username}!')
-                return redirect(to='index')
+                # messages.success(request, f'Welcome back, {user.username}! 🎉')
+                return redirect('index')  # Or whatever page you want to redirect to
             else:
                 messages.error(request, 'Invalid username or password.')
+                return redirect('login')
+
         else:
-            messages.error(request, 'Invalid form submission.')
+            messages.error(request, 'Invalid login details. Check your username and password.')
+            return redirect('login')
     else:
         form = AuthenticationForm()
 
     return render(request, 'login.html', {'form': form})
 
-# User logout view
 def logout_view(request):
+    # Log the user out first
     logout(request)
+
+    # Add a logout success message
+    messages.success(request, 'You have successfully logged out.')
     return redirect('login')
+
 
 # User registration view
 def register_view(request):
@@ -126,6 +134,8 @@ def register_view(request):
             return redirect('login')
     else:
         form = UserCreationForm()
+
+    
 
     return render(request, 'register.html', {'form': form})
 
