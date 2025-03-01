@@ -47,7 +47,8 @@ This is a Django-based web application for showcasing tourist attractions. Users
 6. Install and configure `django-tailwind`:
 
     ```bash
-    python manage.py tailwind init
+    cd theme
+    python manage.py tailwind install
     ```
 
     make sure to remove theme from settings before doing thi
