@@ -10,6 +10,12 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from .models import Comment
 import json
+from .forms import AttractionForm
+from django.contrib.auth.decorators import user_passes_test
+import os
+def is_superuser(user):
+    return user.is_authenticated and user.is_superuser
+
 
 @login_required
 @require_POST
@@ -40,9 +46,20 @@ def delete_comment(request, comment_id):
         return JsonResponse({'success': False, 'error': 'Comment not found or you do not have permission to delete this comment.'})
 # Home page view
 def index(request):
+    print(os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"))
     attractions = Attraction.objects.all()
-    return render(request, 'index.html', {'attractions': attractions})
+    user_liked_dict = {}
 
+    if request.user.is_authenticated:
+        liked_attractions = Like.objects.filter(user=request.user).values_list('attraction', flat=True)
+    else:
+        liked_attractions = []
+    # Pass the user_liked_dict to the template along with attractions and superuser status
+    return render(request, 'index.html', {
+        'attractions': attractions,
+        'is_superuser': request.user.is_superuser,
+        'liked_attractions': liked_attractions,
+    })
 # Attraction detail view
 def attraction_detail(request, id):
     attraction = get_object_or_404(Attraction, id=id)
@@ -65,7 +82,7 @@ def attraction_detail(request, id):
             'comments': comments,
             'user_liked': user_liked
         })
-# Like/unlike attraction view
+
 
 @login_required
 def like_attraction(request, id):
@@ -79,6 +96,8 @@ def like_attraction(request, id):
             liked = True
         return JsonResponse({'liked': liked, 'likes_count': attraction.likes.count()})
     return JsonResponse({'error': 'Invalid request method.'})
+
+
 
 @login_required
 def add_reply(request, comment_id):
@@ -162,3 +181,51 @@ def search_attractions(request):
     attractions = Attraction.objects.filter(name__icontains=query)
     return render(request, 'search_results.html', {'attractions': attractions, 'query': query})
 
+
+
+
+
+
+
+@login_required
+@user_passes_test(is_superuser, login_url='index')
+def add_attraction(request):
+    if request.method == "POST":
+        form = AttractionForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Attraction added successfully!")
+            return redirect('add_attraction') 
+        else:
+            messages.error(request, f"{form.errors}")
+    else:
+        form = AttractionForm()
+    return render(request, 'add_attraction.html', {'form': form})
+
+
+@login_required
+@user_passes_test(is_superuser, login_url='index')
+def edit_attraction(request, id):
+    attraction = get_object_or_404(Attraction, id=id)
+    if request.method == "POST":
+        print("entered here")
+        form = AttractionForm(request.POST, request.FILES, instance=attraction)
+        print(form.is_valid())
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Attraction updated successfully!")
+            return redirect('index')  # Redirect to home
+    else:
+        form = AttractionForm(instance=attraction)
+
+
+    return render(request, 'edit_attraction.html', {'form': form, 'attraction': attraction})
+
+
+@login_required
+@user_passes_test(is_superuser, login_url='index')
+def delete_attraction(request, id):
+    attraction = get_object_or_404(Attraction, id=id)
+    attraction.delete()
+    messages.success(request, "Attraction deleted successfully!")
+    return redirect('index')  # Redirect to home

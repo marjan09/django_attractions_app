@@ -70,16 +70,15 @@
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('search-navbar');
             const searchInputMobile = document.getElementById('search-navbar-mobile');
-            const cards = document.querySelectorAll('.grid a');  // Targeting <a> inside grid
-
-            // Function to filter cards based on search input
+            const cards = document.querySelectorAll('#attractionsContainer .card');
             function filterCards(event) {
                 const query = event.target.value.toLowerCase();
-
-                cards.forEach(card => {
+           cards.forEach(card => {
+                    // const cardText = card.textContent.toLowerCase();
                     const cardText = card.querySelector('h3').textContent.toLowerCase();
+                    console.log(cardText)
                     if (cardText.includes(query)) {
-                        card.style.display = '';  // Reset to default (flex/grid works)
+                        card.style.display = 'block';  // Reset to default (flex/grid works)
                     } else {
                         card.style.display = 'none';
                     }

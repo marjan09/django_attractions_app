@@ -30,10 +30,13 @@ RUN npm install --prefix /app/theme/static_src
 
 # Run migrations
 WORKDIR /app
-RUN python manage.py migrate
+# RUN  chmod +x ./wait-for-db.sh
+
 
 # Build Tailwind CSS
 RUN python manage.py tailwind build
+RUN python manage.py collectstatic --noinput
+RUN python manage.py migrate
 
 # Expose port
 EXPOSE 8000

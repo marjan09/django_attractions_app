@@ -1,7 +1,15 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Comment
+from .models import Comment, Attraction
 import re
+
+
+class AttractionForm(forms.ModelForm):
+    class Meta:
+        model = Attraction
+        fields = ['name', 'description', 'image', 'liked_by'] 
+
+
 class RegisterForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     confirm_password = forms.CharField(widget=forms.PasswordInput)

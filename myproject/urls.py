@@ -32,8 +32,10 @@ urlpatterns = [
     path('attractions/<int:id>/comment/', views.comment_attraction, name='comment_attraction'), 
     path('edit_comment/<int:comment_id>/', views.edit_comment, name='edit_comment'),  # Edit comment
     path('delete_comment/<int:comment_id>/', views.delete_comment, name='delete_comment'), 
-    path('search/', views.search_attractions, name='search_attractions'), # Delete comment # Comment on an attraction # Like an attraction
-
+    path('search/', views.search_attractions, name='search_attractions'),
+    path('attraction/add/', views.add_attraction, name='add_attraction'),
+    path('edit_attraction/<int:id>/', views.edit_attraction, name='edit_attraction'),
+    path('delete_attraction/<int:id>/', views.delete_attraction, name='delete_attraction'), 
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
